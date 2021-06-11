@@ -62,6 +62,7 @@ USER_PERMISSION_TYPES = {
 		"system_swupdate",
 		"system_password",
 		"system_advanced",
+		"system_positioning",
 		"system_reboot",
 		#Root only permissions
 		"system_user",
@@ -83,6 +84,7 @@ USER_PERMISSION_TYPES = {
 		["Firmware Update", "", ""],
 		["Update Password", "checked", "disabled"],
 		["Advance Setting", "", ""],
+		["Positioning", "", ""],
 		["Reboot", "", ""],
 		#Don't need to display root only permissions
 		["", "", ""],

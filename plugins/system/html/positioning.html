@@ -1,0 +1,38 @@
+
+<form id="form-positioning-token">
+	<div class="input-group mt-3">
+		<div class="input-group-prepend i18n" name="Token">
+			<span class="input-group-text i18n">Token</span>
+		</div>
+		<input type="text" class="form-control" id="positioning-token" placeholder="Token to access ublox server" required>
+		<div class="input-group-append">
+			<button type="button" id="bt-positioning-token" class="btn btn-primary float-right i18n" name="Save">Save</button>
+		</div>
+	</div>
+</form>
+
+<form id="form-positioning-switch" class="mt-3">
+	<div class="form-check form-check-inline col-3">
+		<input class="form-check-input" type="radio" name="radio-positioning" id="radio-positioning-disabled" value=0>
+		<label class="form-check-label" for="radio-positioning-disabled">Disabled</label>
+	</div>
+	<div class="form-check form-check-inline col-3">
+		<input class="form-check-input" type="radio" name="radio-positioning" id="radio-positioning-gps" value=4>
+		<label class="form-check-label" for="radio-positioning-gps">GPS</label>
+	</div>
+	<div class="form-check form-check-inline col-3">
+		<input class="form-check-input" type="radio" name="radio-positioning" id="radio-positioning-celllocate" value=2>
+		<label class="form-check-label" for="radio-positioning-celllocate">CellLocate</label>
+	</div>
+	<button type="button" id="bt-positioning-switch" class="btn btn-primary float-right i18n" name="Save">Save</button>
+</form>
+
+<form id="form-positioning-data" class="mt-3">
+	<div class="form-check form-check-inline col-3">
+		<label class="form-check-label longitude">Longitude:</label>
+	</div>
+	<div class="form-check form-check-inline col-3">
+		<label class="form-check-label latitude">Latitude:</label>
+	</div>
+	<button type="button" id="bt-positioning-refresh" class="btn btn-primary float-right i18n" name="Query">Query</button>
+</form>

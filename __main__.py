@@ -11,6 +11,7 @@ from weblcm_files import FileManage, FilesManage, AWMCfgManage
 from weblcm_advanced import Reboot, FactoryReset
 from weblcm_datetime import DateTimeSetting
 from weblcm_settings import SystemSettingsManage
+from weblcm_modem import PositioningSwitch, Positioning
 
 class Root(object):
 
@@ -63,7 +64,7 @@ def force_session_checking():
 
 	paths = (
 				"connections", "connection", "accesspoints", "networkInterfaces",
-				"file", "users", "firmware", "logData", "awm",
+				"file", "users", "firmware", "logData", "awm", "positioning", "positioningSwitch",
 				"logSetting", "factoryReset", "reboot", "files", "datetime"
 			)
 
@@ -111,6 +112,9 @@ if __name__ == '__main__':
 	webapp.reboot = Reboot()
 	webapp.factoryReset = FactoryReset()
 	webapp.datetime = DateTimeSetting()
+
+	webapp.positioningSwitch = PositioningSwitch()
+	webapp.positioning = Positioning()
 
 	setup_http_server()
 

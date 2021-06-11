@@ -7,6 +7,6 @@ setup(
 	py_modules=[
 		'__main__', 'weblcm_network', 'weblcm_log', 'weblcm_def', 'weblcm_swupdate',
 		'weblcm_users', 'weblcm_files', 'weblcm_advanced', 'weblcm_network_status',
-		'weblcm_settings', 'weblcm_datetime'
+		'weblcm_settings', 'weblcm_datetime', 'weblcm_modem'
 	]
 )

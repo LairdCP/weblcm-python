@@ -7,6 +7,7 @@ function systemAUTORUN(retry) {
   swupdateAUTORUN(retry);
   usermanageAUTORUN(retry);
   rebootAUTORUN(retry);
+  positioningAUTORUN(retry);
 }
 
 function advancedAUTORUN(retry) {
@@ -53,6 +54,181 @@ function advancedAUTORUN(retry) {
       toggleAWMGeolocationScannig(1);
     else
       toggleAWMGeolocationScannig(0);
+  });
+}
+
+function ddmm2decimal(data){
+    let deg = Math.floor(data/100);
+    let min = (data - deg*100)/60;
+    return (deg + min);
+}
+
+function getPositioningData() {
+  $.ajax({
+    url: "positioning",
+    type: "GET",
+    contentType: "application/json",
+  })
+  .done(function(data) {
+    SDCERRtoString(data.SDCERR);
+    if ( data.positioning['2'] ) {
+      if(data.positioning['2']['longitude']){
+        $("#form-positioning-data .longitude").text("Longitude: " + data.positioning['2']['longitude']);
+      }
+      if(data.positioning['2']['latitude']){
+        $("#form-positioning-data .latitude").text("Latitude: " + data.positioning['2']['latitude']);
+      }
+    }
+
+    if ( data.positioning['4'] ) {
+      strs = data.positioning['4'].split('\r\n');
+      strs.forEach( function(str) {
+        //Parse $GNGLL format NMEA data
+        if(str.indexOf("$GNGLL") > -1){
+          let sLatitude = str.split(',')[1].trim();
+          let sLongitude = str.split(',')[3].trim();
+
+          if(sLatitude) {
+            let latitude = ddmm2decimal(parseFloat(sLatitude));
+            if(str.split(',')[2] === 'S'){
+              latitude = -latitude;
+            }
+            $("#form-positioning-data .latitude").text("Latitude: " + latitude);
+          }
+
+          if(sLongitude) {
+            let longitude = ddmm2decimal(parseFloat(sLongitude));
+            if(str.split(',')[4] === 'W'){
+              longitude = -longitude;
+            }
+            $("#form-positioning-data .longitude").text("Longitude: " + longitude);
+          }
+        }
+      })
+    }
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+function setPositioningSwitchOnUI(data){
+  switch(data) {
+    case 2:
+      $("#radio-positioning-celllocate").prop('checked',true);
+      $("#radio-positioning-gps").prop('disabled',true);
+      break;
+    case 4:
+      $("#radio-positioning-gps").prop('checked',true);
+      $("#radio-positioning-celllocate").prop('disabled',true);
+      break;
+    default:
+      $("#radio-positioning-disabled").prop('checked',true);
+      $("#radio-positioning-gps").prop('disabled',false);
+      $("#radio-positioning-celllocate").prop('disabled',false);
+      break;
+    }
+}
+
+function togglePositioningSwitch(enable) {
+  let data = {
+    positioning: enable,
+  }
+
+  $.ajax({
+    url: "positioningSwitch",
+    type: "PUT",
+    data: JSON.stringify(data),
+    contentType: "application/json",
+  })
+  .done(function(data) {
+    SDCERRtoString(data.SDCERR);
+    setPositioningSwitchOnUI(data.positioning);
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+function getPositioningSwitch() {
+  $.ajax({
+    url: "positioningSwitch",
+    type: "GET",
+    contentType: "application/json",
+  })
+  .done(function(data) {
+    setPositioningSwitchOnUI(data.positioning);
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+//It takes a few seconds to enable/disable positioning
+function savePositioningToken() {
+  let data = {
+    token:$("#positioning-token").val().trim(),
+  }
+
+  $.ajax({
+    url: "positioning",
+    type: "PUT",
+    data: JSON.stringify(data),
+    contentType: "application/json",
+  })
+  .done(function(data) {
+    SDCERRtoString(data.SDCERR);
+    if(!data.SDCERR)
+      $("#positioning-token").val('');
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+function clickPositioningPage() {
+  $.ajax({
+    url: "plugins/system/html/positioning.html",
+    data: {},
+    type: "GET",
+    dataType: "html",
+  })
+  .done(function(data){
+    $(".active").removeClass("active");
+    $("#system_positioning_main_menu").addClass("active");
+    $("#system_positioning_mini_menu").addClass("active");
+    $("#main_section").html(data);
+    setLanguage("main_section");
+    clearReturnData();
+    getPositioningSwitch();
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+function positioningAUTORUN(retry) {
+
+  $(document).on("click", "#system_positioning_mini_menu, #system_positioning_main_menu", function(){
+    clickPositioningPage();
+  });
+
+  $(document).on("click", "#bt-positioning-switch", function(){
+    let form = document.querySelector("#form-positioning-switch");
+    let data = new FormData(form);
+    let output = 0;
+    for (const entry of data) {
+      output += parseInt(entry[1]);
+    };
+    togglePositioningSwitch(output);
+  });
+
+  $(document).on("click", "#bt-positioning-refresh", function(){
+    getPositioningData();
+  });
+
+  $(document).on("click", "#bt-positioning-token", function(){
+    savePositioningToken();
   });
 }
 
