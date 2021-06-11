@@ -1,7 +1,7 @@
 import os
 import sys
 import cherrypy
-import dbus.mainloop.glib
+from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 import NetworkManager
 from threading import Thread, Lock
@@ -259,8 +259,6 @@ def dev_statechange(dev, interface, signal, new_state, old_state, reason):
 
 def run_event_listener():
 
-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
 	NetworkStatusHelper.network_status_query()
 
 	NetworkManager.NetworkManager.OnDeviceAdded(dev_added)
@@ -278,7 +276,10 @@ def run_event_listener():
 @cherrypy.expose
 class NetworkStatus(object):
 
+	DBusGMainLoop(set_as_default=True)
+
 	def __init__(self):
+
 		t = Thread(target=run_event_listener, daemon=True)
 		t.start()
 
