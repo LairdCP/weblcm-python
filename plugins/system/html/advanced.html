@@ -60,6 +60,23 @@
 						<input type="checkbox" class="custom-control-input" id="switch-awm-geolocation-scanning">
 						<label class="custom-control-label i18n" for="switch-awm-geolocation-scanning" name="WIFI Geolocation Scanning" >WIFI Geolocation Scanning</label>
 					</div>
+
+					<form id="form-fips-switch" class="mt-3">
+						<div class="form-check form-check-inline col-3">
+							<input class="form-check-input" type="radio" name="radio-fips-switch" id="fips-switch-disabled" value="unset">
+							<label class="form-check-label" for="fips-switch-disabled">Disabled</label>
+						</div>
+						<div class="form-check form-check-inline col-3">
+							<input class="form-check-input" type="radio" name="radio-fips-switch" id="fips-switch-fips" value="fips">
+							<label class="form-check-label" for="fips-switch-fips">FIPS</label>
+						</div>
+						<div class="form-check form-check-inline col-3">
+							<input class="form-check-input" type="radio" name="radio-fips-switch" id="fips-switch-fips-wifi" value="fips_wifi">
+							<label class="form-check-label" for="fips-switch-fips-wifi">FIPS wifi</label>
+						</div>
+						<button type="button" id="bt-fips-switch" class="btn btn-primary float-right i18n" name="Save">Save</button>
+					</form>
+
 				</div>
 			</div>
 		</div>

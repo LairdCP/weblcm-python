@@ -55,6 +55,10 @@ function advancedAUTORUN(retry) {
     else
       toggleAWMGeolocationScannig(0);
   });
+
+  $(document).on("click", "#bt-fips-switch", function(){
+    toggleFipsSwitch();
+  });
 }
 
 function ddmm2decimal(data){
@@ -361,6 +365,7 @@ function clickAdvancedPage() {
     setLanguage("main_section");
     clearReturnData();
     getAWMGeolocationScannig();
+    getFipsStatus();
   })
   .fail(function( xhr, textStatus, errorThrown) {
     httpErrorResponseHandler(xhr, textStatus, errorThrown)
@@ -389,6 +394,45 @@ function datetimeAUTORUN(retry) {
     saveDateTime();
   });
 
+}
+
+function getFipsStatus() {
+  $.ajax({
+    url: "fips",
+    type: "GET",
+    cache: false,
+  })
+  .done(function(data) {
+    if(data.status === "fips_wifi")
+      $("#fips-switch-fips-wifi").prop('checked', true);
+    else if(data.status === "fips")
+      $("#fips-switch-fips").prop('checked', true);
+    else
+      $("#fips-switch-disabled").prop('checked', true);
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
+}
+
+function toggleFipsSwitch() {
+  let data = {
+    fips: $("input:radio[name='radio-fips-switch']:checked").val(),
+  }
+  $.ajax({
+    url: "fips",
+    data: JSON.stringify(data),
+    type: "PUT",
+    contentType: "application/json",
+  })
+  .done(function(data) {
+    SDCERRtoString(data.SDCERR);
+    if(data.SDCERR)
+      getFipsStatus();
+  })
+  .fail(function( xhr, textStatus, errorThrown) {
+    httpErrorResponseHandler(xhr, textStatus, errorThrown)
+  });
 }
 
 function validateDateString(date){
