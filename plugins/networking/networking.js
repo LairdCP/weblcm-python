@@ -1305,7 +1305,8 @@ function prepareWirelessConnection() {
     }
     else if (keymgmt == "wpa-psk") {
       v = $("#psk").val();
-      if(v && !validate_string_input(v, $("#psk"), 8, 64)){
+
+      if(!validate_string_input(v, $("#psk"), 8, 64)){
         return {};
       }
       if(v)
