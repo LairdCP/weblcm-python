@@ -1128,17 +1128,22 @@ function prepareConnectionConnection(){
 
 function prepareEthernetConnection() {
   let settings = {};
+
   con = prepareConnectionConnection();
-  if(con)
-    settings['connection'] = con;
+  if(jQuery.isEmptyObject(con))
+    return {};
+
+  settings['connection'] = con;
   return settings;
 }
 
 function prepareBridgeConnection() {
   let settings = {};
   con = prepareConnectionConnection();
-  if(con)
-    settings['connection'] = con;
+  if(jQuery.isEmptyObject(con))
+    return {};
+
+  settings['connection'] = con;
   return settings;
 }
 
@@ -1406,21 +1411,21 @@ function prepareWirelessConnection() {
   }
 
   con = prepareConnectionConnection();
-  if(!con)
-    return con;
+  if(jQuery.isEmptyObject(con))
+    return {};
 
   ws = prepareWireless();
-  if(!ws)
-    return ws;
+  if(jQuery.isEmptyObject(ws))
+    return {};
 
   wss = prepareWirelessSecurity();
-  if(!wss)
-    return wss
+  if(jQuery.isEmptyObject(wss))
+    return {};
 
   if (wss['key-mgmt'] == "wpa-eap") {
     wxs = prepareWireless8021x(con['id'], ws['ssid']);
-    if(!wxs)
-      return wxs;
+    if(jQuery.isEmptyObject(wxs))
+      return {};
   }
 
   settings['connection'] = con;
@@ -1432,17 +1437,14 @@ function prepareWirelessConnection() {
 }
 
 function prepareIPv4Addresses(){
-  let result = {
-    'error': true,
-    'ipv4':{}
-  };
+  let ipv4 = {};
 
   var ipFormat = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   var prefixFormat = /^(3[0-2]|[0-2]?[0-9])$/;
 
-  result.ipv4['method'] = $("#ipv4-method").val();
+  ipv4['method'] = $("#ipv4-method").val();
 
-  result.ipv4['address-data'] = [];
+  ipv4['address-data'] = [];
   if($("#ipv4-addresses").val()){
     let ips = $("#ipv4-addresses").val().split(',');
     for(let i=0; i<ips.length; i++){
@@ -1450,9 +1452,9 @@ function prepareIPv4Addresses(){
       if(data.length != 2 || !data[0].match(ipFormat) || !data[1].match(prefixFormat)){
         $("#ipv4-addresses").css('border-color', 'red');
         $("#ipv4-addresses").focus();
-        return result;
+        return {};
       }
-      result.ipv4['address-data'].push({'address':data[0], 'prefix':data[1]});
+      ipv4['address-data'].push({'address':data[0], 'prefix':data[1]});
     }
     $("#ipv4-addresses").css('border-color', '');
   }
@@ -1461,62 +1463,58 @@ function prepareIPv4Addresses(){
     if(!$("#ipv4-gateway").val().match(ipFormat)){
       $("#ipv4-gateway").css('border-color', 'red');
       $("#ipv4-gateway").focus();
-      return result;
+      return {};
     }
-    result.ipv4['gateway'] = $("#ipv4-gateway").val();
+    ipv4['gateway'] = $("#ipv4-gateway").val();
     $("#ipv4-gateway").css('border-color', '');
   }
 
-  result.ipv4['dns'] = [];
+  ipv4['dns'] = [];
   if($("#ipv4-dns").val()){
     let ips = $("#ipv4-dns").val().split(',');
     for(let i=0; i<ips.length; i++){
       if(!ips[i].match(ipFormat)){
         $("#ipv4-dns").css('border-color', 'red');
         $("#ipv4-dns").focus();
-        return result;
+        return {};
       }
-      result.ipv4['dns'].push(ips[i]);
+      ipv4['dns'].push(ips[i]);
     }
     $("#ipv4-dns").css('border-color', '');
   }
 
-  result.error = false;
-  return result;
+  return ipv4;
 }
 
 function prepareIPv6Addresses(){
-  let result = {
-    'error': true,
-    'ipv6':{}
-  };
+  let ipv6 = {};
 
   var ipFormat = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
   var prefixFormat = /^(1[01][0-9]|12[0-8]|[0-9]?[0-9])$/;
   var tokenFormat = /^::([0-9a-fA-F]{1,4}:){3}[0-9a-fA-F]{1,4}$/;
 
-  result.ipv6['addr-gen-mode'] = parseInt($("#ipv6-addr-gen-mode").val());
+  ipv6['addr-gen-mode'] = parseInt($("#ipv6-addr-gen-mode").val());
 
-  if(!result.ipv6['addr-gen-mode']) {
+  if(!ipv6['addr-gen-mode']) {
     if(!$("#ipv6-token").val().match(tokenFormat)){
       $("#ipv6-token").css('border-color', 'red');
       $("#ipv6-token").focus();
-      return result;
+      return {};
     }
-    result.ipv6['token'] = $("#ipv6-token").val();
+    ipv6['token'] = $("#ipv6-token").val();
   }
   else if($("#ipv6-token").val().trim()) {
       $("#ipv6-token").css('border-color', 'red');
       $("#ipv6-token").focus();
-      return result;
+      return {};
   }
   $("#ipv6-token").css('border-color', '');
 
-  result.ipv6['method'] = $("#ipv6-method").val();
-  if(result.ipv6['method'] == "manual" && $("#ipv6-addresses").val()=="")
-    return result;
+  ipv6['method'] = $("#ipv6-method").val();
+  if(ipv6['method'] == "manual" && $("#ipv6-addresses").val() == "")
+    return {};
 
-  result.ipv6['address-data'] = [];
+  ipv6['address-data'] = [];
   if($("#ipv6-addresses").val()){
     let ips = $("#ipv6-addresses").val().split(',');
     for(let i=0; i<ips.length; i++){
@@ -1524,9 +1522,9 @@ function prepareIPv6Addresses(){
       if(data.length != 2 || !data[0].match(ipFormat) || !data[1].match(prefixFormat)){
         $("#ipv6-addresses").css('border-color', 'red');
         $("#ipv6-addresses").focus();
-        return result;
+        return {};
       }
-      result.ipv6['address-data'].push({'address':data[0], 'prefix':data[1]});
+      ipv6['address-data'].push({'address':data[0], 'prefix':data[1]});
     }
     $("#ipv6-addresses").css('border-color', '');
   }
@@ -1535,31 +1533,32 @@ function prepareIPv6Addresses(){
     if(!$("#ipv6-gateway").val().match(ipFormat)){
       $("#ipv6-gateway").css('border-color', 'red');
       $("#ipv6-gateway").focus();
-      return result;
+      return {};
     }
-    result.ipv6['gateway'] = $("#ipv6-gateway").val();
+    ipv6['gateway'] = $("#ipv6-gateway").val();
     $("#ipv6-gateway").css('border-color', '');
   }
 
-  result.ipv6['dns'] = [];
+  ipv6['dns'] = [];
   if($("#ipv6-dns").val()){
     let ips = $("#ipv6-dns").val().split(',');
     for(let i=0; i<ips.length; i++){
       if(ips[i].match(ipFormat)){
         $("#ipv6-dns").css('border-color', 'red');
         $("#ipv6-dns").focus();
-        return result;
+        return {};
       }
-      result.ipv6['dns'].push(ips[i]);
+      ipv6['dns'].push(ips[i]);
     }
     $("#ipv6-dns").css('border-color', '');
   }
 
-  result.error = false;
-  return result;
+  return ipv6;
 }
 
 function addConnection() {
+  let ipv4 = {};
+  let ipv6 = {};
 
   let ctype = $("#connection-type").val();
   switch(ctype){
@@ -1582,24 +1581,24 @@ function addConnection() {
       break;
   }
 
-  if (!new_connection){
+  if (jQuery.isEmptyObject(new_connection)){
     customMsg("Invalid Settings", true);
     return;
   }
 
-  let result = prepareIPv4Addresses();
-  if(result.error){
+  ipv4 = prepareIPv4Addresses();
+  if(jQuery.isEmptyObject(ipv4)){
     customMsg("Invalid ipv4 Settings", true);
     return;
   }
-  new_connection['ipv4'] = result.ipv4;
+  new_connection['ipv4'] = ipv4;
 
-  result = prepareIPv6Addresses();
-  if(result.error){
+  ipv6 = prepareIPv6Addresses();
+  if(jQuery.isEmptyObject(ipv6)){
     customMsg("Invalid ipv6 Settings", true);
     return;
   }
-  new_connection['ipv6'] = result.ipv6;
+  new_connection['ipv6'] = ipv6
 
   $.ajax({
     url: "connection",
